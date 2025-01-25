@@ -1,12 +1,13 @@
 package com.tcp.tcp_communication.config
 
 import com.tcp.tcp_communication.handler.CalcHandler
-import com.tcp.tcp_communication.serialize.CalcSerializer
+import com.tcp.tcp_communication.shared.CalcSerializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.integration.dsl.IntegrationFlow
 import org.springframework.integration.ip.dsl.Tcp
+import org.springframework.integration.ip.dsl.TcpInboundGatewaySpec
 
 @Configuration
 class TcpServerConfig(
@@ -18,13 +19,15 @@ class TcpServerConfig(
   @Bean
   fun tcpServer(): IntegrationFlow {
     return IntegrationFlow.from(generateInboundGateway())
-      .handle(calcHandler::handle)
+      .handle(calcHandler)
       .get()
   }
 
-  private fun generateInboundGateway() = Tcp.inboundGateway(
-    Tcp.nioServer(port)
-      .serializer(calcSerializer)
-      .deserializer(calcSerializer)
-  )
+  private fun generateInboundGateway(): TcpInboundGatewaySpec {
+    return Tcp.inboundGateway(
+      Tcp.nioServer(port)
+        .serializer(calcSerializer)
+        .deserializer(calcSerializer)
+    )
+  }
 }

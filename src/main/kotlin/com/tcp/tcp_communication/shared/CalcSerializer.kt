@@ -1,4 +1,4 @@
-package com.tcp.tcp_communication.serialize
+package com.tcp.tcp_communication.shared
 
 import com.tcp.tcp_communication.model.enum.Operation
 import com.tcp.tcp_communication.model.enum.Status
@@ -15,9 +15,9 @@ class CalcSerializer : Serializer<CalcResponse>, Deserializer<CalcRequest> {
   override fun deserialize(inputStream: InputStream): CalcRequest {
     val buffer = ByteArray(BUFFER_SIZE)
     inputStream.read(buffer)
-    val num1 = buffer[FIRST_NUMBER_INDEX].toString().toInt()
-    val num2 = buffer[SECOND_NUMBER_INDEX].toString().toInt()
-    val operation = when (buffer[OPERATION_INDEX].toInt().toChar()) {
+    val num1 = convertToInt(buffer[FIRST_NUMBER_INDEX])
+    val num2 = convertToInt(buffer[SECOND_NUMBER_INDEX])
+    val operation = when (convertToInt(buffer[OPERATION_INDEX]).toChar()) {
       ADDITION_SYMBOL -> Operation.ADD
       SUBTRACTION_SYMBOL -> Operation.SUBTRACT
       else -> throw IllegalArgumentException("Invalid operation")
@@ -37,6 +37,9 @@ class CalcSerializer : Serializer<CalcResponse>, Deserializer<CalcRequest> {
 
   private fun buildResponseBytes(status: Char, calcResult: Int): ByteArray =
     byteArrayOf(status.code.toByte()) + calcResult.toString().padStart(2, '0').toByteArray()
+
+  private fun convertToInt(byte: Byte): Int =
+    String.format("%02X", byte).toInt(16)
 
   companion object {
     private const val BUFFER_SIZE = 3
