@@ -13,17 +13,23 @@ import java.io.OutputStream
 @Component
 class CalcSerializer : Serializer<CalcResponse>, Deserializer<CalcRequest> {
   override fun deserialize(inputStream: InputStream): CalcRequest {
-    val buffer = ByteArray(BUFFER_SIZE)
-    inputStream.read(buffer)
-    val num1 = convertToInt(buffer[FIRST_NUMBER_INDEX])
-    val num2 = convertToInt(buffer[SECOND_NUMBER_INDEX])
-    val operation = when (convertToInt(buffer[OPERATION_INDEX]).toChar()) {
-      ADDITION_SYMBOL -> Operation.ADD
-      SUBTRACTION_SYMBOL -> Operation.SUBTRACT
-      else -> throw IllegalArgumentException("Invalid operation")
-    }
+    return try {
+      val buffer = ByteArray(BUFFER_SIZE)
+      if (inputStream.read(buffer) != BUFFER_SIZE) {
+        error("Invalid input size")
+      }
+      val num1 = convertToInt(buffer[FIRST_NUMBER_INDEX])
+      val num2 = convertToInt(buffer[SECOND_NUMBER_INDEX])
+      val operation = when (convertToInt(buffer[OPERATION_INDEX]).toChar()) {
+        ADDITION_SYMBOL -> Operation.ADD
+        SUBTRACTION_SYMBOL -> Operation.SUBTRACT
+        else -> error("Invalid operation")
+      }
 
-    return CalcRequest(num1, num2, operation)
+      CalcRequest(num1, num2, operation)
+    } catch (e: Exception) {
+      CalcRequest(0, 0, Operation.OTHER)
+    }
   }
 
   override fun serialize(response: CalcResponse, outputStream: OutputStream) {
@@ -32,11 +38,10 @@ class CalcSerializer : Serializer<CalcResponse>, Deserializer<CalcRequest> {
       Status.ERROR -> buildResponseBytes(ERROR_STATUS, ERROR_RESULT)
     }
     outputStream.write(responseBytes)
-    outputStream.flush()
   }
 
   private fun buildResponseBytes(status: Char, calcResult: Int): ByteArray =
-    byteArrayOf(status.code.toByte()) + calcResult.toString().padStart(2, '0').toByteArray()
+    byteArrayOf(status.code.toByte(), calcResult.toByte())
 
   private fun convertToInt(byte: Byte): Int =
     String.format("%02X", byte).toInt(16)

@@ -10,11 +10,11 @@ Server -> serializer
 serializer -> serializer: バイナリデータをリクエストオブジェクトに変換(deserialize)
 serializer -> handler
 handler -> uc
-uc -> uc: ビジネスロジック処理
-uc --> handler: 処理結果返却
-handler --> serializer: レスポンスオブジェクト返却
+uc -> uc: 演算処理
+uc --> handler: レスポンスオブジェクト返却
+handler --> serializer
 serializer -> serializer: レスポンスオブジェクトをバイナリに変換(serialize)
-serializer --> Server: バイナリデータ返却
+serializer --> Server
 Server --> Client: レスポンス
 
 @enduml

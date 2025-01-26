@@ -12,6 +12,7 @@ class CalcUseCaseImpl: CalcUseCase {
     val result = when (request.operation) {
       Operation.ADD -> request.num1 + request.num2
       Operation.SUBTRACT -> request.num1 - request.num2
+      Operation.OTHER -> error("Invalid operation")
     }
     return CalcResponse(result, Status.SUCCESS)
   }
