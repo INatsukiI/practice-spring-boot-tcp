@@ -1,0 +1,20 @@
+@startuml
+participant TcpClient as Client
+participant TcpServer as Server
+participant Customserializer as serializer
+participant Handler as handler
+participant UseCase as uc
+
+Client -> Server: リクエスト
+Server -> serializer
+serializer -> serializer: バイナリデータをリクエストオブジェクトに変換(deserialize)
+serializer -> handler
+handler -> uc
+uc -> uc: 演算処理
+uc --> handler: レスポンスオブジェクト返却
+handler --> serializer
+serializer -> serializer: レスポンスオブジェクトをバイナリに変換(serialize)
+serializer --> Server
+Server --> Client: レスポンス
+
+@enduml
