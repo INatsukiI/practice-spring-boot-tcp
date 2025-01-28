@@ -7,13 +7,13 @@ participant UseCase as uc
 
 Client -> Server: リクエスト
 Server -> serializer
-serializer -> serializer: バイナリデータをリクエストオブジェクトに変換(deserialize)
+serializer -> serializer: バイト配列をリクエストオブジェクトに変換(deserialize)
 serializer -> handler
 handler -> uc
 uc -> uc: 演算処理
 uc --> handler: レスポンスオブジェクト返却
 handler --> serializer
-serializer -> serializer: レスポンスオブジェクトをバイナリに変換(serialize)
+serializer -> serializer: レスポンスオブジェクトをバイト配列に変換(serialize)
 serializer --> Server
 Server --> Client: レスポンス
 
